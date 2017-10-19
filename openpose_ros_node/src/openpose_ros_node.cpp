@@ -158,105 +158,105 @@ DEFINE_string(result_image_topic,              "",          "topic name for publ
 
 op::PoseModel gflagToPoseModel(const std::string& poseModeString)
 {
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    if (poseModeString == "COCO")
-        return op::PoseModel::COCO_18;
-    else if (poseModeString == "MPI")
-        return op::PoseModel::MPI_15;
-    else if (poseModeString == "MPI_4_layers")
-        return op::PoseModel::MPI_15_4;
-    else
-    {
-        op::error("String does not correspond to any model (COCO, MPI, MPI_4_layers)", __LINE__, __FUNCTION__, __FILE__);
-        return op::PoseModel::COCO_18;
-    }
+  op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+  if (poseModeString == "COCO")
+    return op::PoseModel::COCO_18;
+  else if (poseModeString == "MPI")
+    return op::PoseModel::MPI_15;
+  else if (poseModeString == "MPI_4_layers")
+    return op::PoseModel::MPI_15_4;
+  else
+  {
+    op::error("String does not correspond to any model (COCO, MPI, MPI_4_layers)", __LINE__, __FUNCTION__, __FILE__);
+    return op::PoseModel::COCO_18;
+  }
 }
 
 op::ScaleMode gflagToScaleMode(const int keypointScale)
 {
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    if (keypointScale == 0)
-        return op::ScaleMode::InputResolution;
-    else if (keypointScale == 1)
-        return op::ScaleMode::NetOutputResolution;
-    else if (keypointScale == 2)
-        return op::ScaleMode::OutputResolution;
-    else if (keypointScale == 3)
-        return op::ScaleMode::ZeroToOne;
-    else if (keypointScale == 4)
-        return op::ScaleMode::PlusMinusOne;
-    else
-    {
-        const std::string message = "String does not correspond to any scale mode: (0, 1, 2, 3, 4) for (InputResolution,"
-                                    " NetOutputResolution, OutputResolution, ZeroToOne, PlusMinusOne).";
-        op::error(message, __LINE__, __FUNCTION__, __FILE__);
-        return op::ScaleMode::InputResolution;
-    }
+  op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+  if (keypointScale == 0)
+    return op::ScaleMode::InputResolution;
+  else if (keypointScale == 1)
+    return op::ScaleMode::NetOutputResolution;
+  else if (keypointScale == 2)
+    return op::ScaleMode::OutputResolution;
+  else if (keypointScale == 3)
+    return op::ScaleMode::ZeroToOne;
+  else if (keypointScale == 4)
+    return op::ScaleMode::PlusMinusOne;
+  else
+  {
+    const std::string message = "String does not correspond to any scale mode: (0, 1, 2, 3, 4) for (InputResolution,"
+                                " NetOutputResolution, OutputResolution, ZeroToOne, PlusMinusOne).";
+    op::error(message, __LINE__, __FUNCTION__, __FILE__);
+    return op::ScaleMode::InputResolution;
+  }
 }
 
 std::vector<op::HeatMapType> gflagToHeatMaps(const bool heatMapsAddParts, const bool heatMapsAddBkg, const bool heatMapsAddPAFs)
 {
-    std::vector<op::HeatMapType> heatMapTypes;
-    if (heatMapsAddParts)
-        heatMapTypes.emplace_back(op::HeatMapType::Parts);
-    if (heatMapsAddBkg)
-        heatMapTypes.emplace_back(op::HeatMapType::Background);
-    if (heatMapsAddPAFs)
-        heatMapTypes.emplace_back(op::HeatMapType::PAFs);
-    return heatMapTypes;
+  std::vector<op::HeatMapType> heatMapTypes;
+  if (heatMapsAddParts)
+    heatMapTypes.emplace_back(op::HeatMapType::Parts);
+  if (heatMapsAddBkg)
+    heatMapTypes.emplace_back(op::HeatMapType::Background);
+  if (heatMapsAddPAFs)
+    heatMapTypes.emplace_back(op::HeatMapType::PAFs);
+  return heatMapTypes;
 }
 
 op::RenderMode gflagToRenderMode(const int renderFlag, const int renderPoseFlag = -2)
 {
-    if (renderFlag == -1 && renderPoseFlag != -2)
-        return gflagToRenderMode(renderPoseFlag, -2);
-    else if (renderFlag == 0)
-        return op::RenderMode::None;
-    else if (renderFlag == 1)
-        return op::RenderMode::Cpu;
-    else if (renderFlag == 2)
-        return op::RenderMode::Gpu;
-    else
-    {
-        op::error("Undefined RenderMode selected.", __LINE__, __FUNCTION__, __FILE__);
-        return op::RenderMode::None;
-    }
+  if (renderFlag == -1 && renderPoseFlag != -2)
+    return gflagToRenderMode(renderPoseFlag, -2);
+  else if (renderFlag == 0)
+    return op::RenderMode::None;
+  else if (renderFlag == 1)
+    return op::RenderMode::Cpu;
+  else if (renderFlag == 2)
+    return op::RenderMode::Gpu;
+  else
+  {
+    op::error("Undefined RenderMode selected.", __LINE__, __FUNCTION__, __FILE__);
+    return op::RenderMode::None;
+  }
 }
 
 // Google flags into program variables
 std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel, op::ScaleMode,
-           std::vector<op::HeatMapType>> gflagsToOpParameters()
+std::vector<op::HeatMapType>> gflagsToOpParameters()
 {
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    // outputSize
-    op::Point<int> outputSize;
-    auto nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
-    nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
-    op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ",
-               __LINE__, __FUNCTION__, __FILE__);
-    // netInputSize
-    op::Point<int> netInputSize;
-    nRead = sscanf(FLAGS_net_resolution.c_str(), "%dx%d", &netInputSize.x, &netInputSize.y);
-    op::checkE(nRead, 2, "Error, net resolution format (" +  FLAGS_net_resolution + ") invalid, should be e.g., 656x368 (multiples of 16)",
-               __LINE__, __FUNCTION__, __FILE__);
-    // faceNetInputSize
-    op::Point<int> faceNetInputSize;
-    nRead = sscanf(FLAGS_face_net_resolution.c_str(), "%dx%d", &faceNetInputSize.x, &faceNetInputSize.y);
-    op::checkE(nRead, 2, "Error, face net resolution format (" +  FLAGS_face_net_resolution
-               + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
-    // handNetInputSize
-    op::Point<int> handNetInputSize;
-    nRead = sscanf(FLAGS_hand_net_resolution.c_str(), "%dx%d", &handNetInputSize.x, &handNetInputSize.y);
-    op::checkE(nRead, 2, "Error, hand net resolution format (" +  FLAGS_hand_net_resolution
-               + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
-    // poseModel
-    const auto poseModel = gflagToPoseModel(FLAGS_model_pose);
-    // keypointScale
-    const auto keypointScale = gflagToScaleMode(FLAGS_keypoint_scale);
-    // heatmaps to add
-    const auto heatMapTypes = gflagToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
-    // Return
-    return std::make_tuple(outputSize, netInputSize, faceNetInputSize, handNetInputSize, poseModel, keypointScale, heatMapTypes);
+  op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+  // outputSize
+  op::Point<int> outputSize;
+  auto nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
+  nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
+  op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ",
+             __LINE__, __FUNCTION__, __FILE__);
+  // netInputSize
+  op::Point<int> netInputSize;
+  nRead = sscanf(FLAGS_net_resolution.c_str(), "%dx%d", &netInputSize.x, &netInputSize.y);
+  op::checkE(nRead, 2, "Error, net resolution format (" +  FLAGS_net_resolution + ") invalid, should be e.g., 656x368 (multiples of 16)",
+             __LINE__, __FUNCTION__, __FILE__);
+  // faceNetInputSize
+  op::Point<int> faceNetInputSize;
+  nRead = sscanf(FLAGS_face_net_resolution.c_str(), "%dx%d", &faceNetInputSize.x, &faceNetInputSize.y);
+  op::checkE(nRead, 2, "Error, face net resolution format (" +  FLAGS_face_net_resolution
+             + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
+  // handNetInputSize
+  op::Point<int> handNetInputSize;
+  nRead = sscanf(FLAGS_hand_net_resolution.c_str(), "%dx%d", &handNetInputSize.x, &handNetInputSize.y);
+  op::checkE(nRead, 2, "Error, hand net resolution format (" +  FLAGS_hand_net_resolution
+             + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
+  // poseModel
+  const auto poseModel = gflagToPoseModel(FLAGS_model_pose);
+  // keypointScale
+  const auto keypointScale = gflagToScaleMode(FLAGS_keypoint_scale);
+  // heatmaps to add
+  const auto heatMapTypes = gflagToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
+  // Return
+  return std::make_tuple(outputSize, netInputSize, faceNetInputSize, handNetInputSize, poseModel, keypointScale, heatMapTypes);
 }
 
 op::Point<int> outputSize;
@@ -277,134 +277,217 @@ op::FaceExtractor *faceExtractor;
 op::FaceRenderer *faceRenderer;
 op::OpOutputToCvMat *opOutputToCvMat;
 
+std::map<int, int> skeleton_map;
+
+bool DEBUG_PRINT = false;
+
 int init_openpose()
 {
-    // logging_level
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
-    op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-    // op::ConfigureLog::setPriorityThreshold(op::Priority::None); // To print all logging messages
+  // logging_level
+  op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
+  op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
+  // op::ConfigureLog::setPriorityThreshold(op::Priority::None); // To print all logging messages
 
-    const auto timerBegin = std::chrono::high_resolution_clock::now();
+  const auto timerBegin = std::chrono::high_resolution_clock::now();
 
-    // Applying user defined configuration
-    std::tie(outputSize, netInputSize, faceNetInputSize, handNetInputSize, poseModel, keypointScale,
-             heatMapTypes) = gflagsToOpParameters();
-    netOutputSize = netInputSize;
+  // Applying user defined configuration
+  std::tie(outputSize, netInputSize, faceNetInputSize, handNetInputSize, poseModel, keypointScale,
+           heatMapTypes) = gflagsToOpParameters();
+  netOutputSize = netInputSize;
 
-    // Initialize
-    cvMatToOpInput = new op::CvMatToOpInput(netInputSize, FLAGS_num_scales, (float)FLAGS_scale_gap);
-    cvMatToOpOutput = new op::CvMatToOpOutput(outputSize);
-    poseExtractorCaffe = new op::PoseExtractorCaffe(netInputSize, netOutputSize, outputSize, FLAGS_num_scales, poseModel, FLAGS_model_folder, FLAGS_num_gpu_start);
-    poseRenderer = new op::PoseRenderer(netOutputSize, outputSize, poseModel, nullptr, !FLAGS_disable_blending, (float)FLAGS_alpha_pose);
-    faceDetector = new op::FaceDetector(poseModel);
-    faceExtractor = new op::FaceExtractor(faceNetInputSize, faceNetInputSize, FLAGS_model_folder, FLAGS_num_gpu_start);
-    faceRenderer = new op::FaceRenderer(netOutputSize, (float)FLAGS_alpha_pose, (float) 0.7);
-    opOutputToCvMat = new op::OpOutputToCvMat(outputSize);
+  // Initialize
+  cvMatToOpInput = new op::CvMatToOpInput(netInputSize, FLAGS_num_scales, (float)FLAGS_scale_gap);
+  cvMatToOpOutput = new op::CvMatToOpOutput(outputSize);
+  poseExtractorCaffe = new op::PoseExtractorCaffe(netInputSize, netOutputSize, outputSize, FLAGS_num_scales, poseModel, FLAGS_model_folder, FLAGS_num_gpu_start);
+  poseRenderer = new op::PoseRenderer(netOutputSize, outputSize, poseModel, nullptr, !FLAGS_disable_blending, (float)FLAGS_alpha_pose);
+  faceDetector = new op::FaceDetector(poseModel);
+  faceExtractor = new op::FaceExtractor(faceNetInputSize, faceNetInputSize, FLAGS_model_folder, FLAGS_num_gpu_start);
+  faceRenderer = new op::FaceRenderer(netOutputSize, (float)FLAGS_alpha_pose, (float) 0.7);
+  opOutputToCvMat = new op::OpOutputToCvMat(outputSize);
 
-    poseExtractorCaffe->initializationOnThread();
-    poseRenderer->initializationOnThread();
-    faceExtractor->initializationOnThread();
-    faceRenderer->initializationOnThread();
+  poseExtractorCaffe->initializationOnThread();
+  poseRenderer->initializationOnThread();
+  faceExtractor->initializationOnThread();
+  faceRenderer->initializationOnThread();
 
-    // Measuring total time
-    const auto now = std::chrono::high_resolution_clock::now();
-    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
-    const auto message = "Initialized. Total time: " + std::to_string(totalTimeSec) + " seconds.";
-    ROS_INFO_STREAM(message);
+  // Measuring total time
+  const auto now = std::chrono::high_resolution_clock::now();
+  const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
+  const auto message = "Initialized. Total time: " + std::to_string(totalTimeSec) + " seconds.";
+  ROS_INFO_STREAM(message);
 
-    return 0;
+  // skeleton map <lower joint : upper joint>
+  skeleton_map[1] = 0;
+  // right arm
+  skeleton_map[2] = 1;
+  skeleton_map[3] = 2;
+  skeleton_map[4] = 3;
+  // left arm
+  skeleton_map[5] = 1;
+  skeleton_map[6] = 5;
+  skeleton_map[7] = 6;
+  // right leg
+  skeleton_map[8] = 1;
+  skeleton_map[9] = 8;
+  skeleton_map[10] = 9;
+  // left leg
+  skeleton_map[11] = 1;
+  skeleton_map[12] = 11;
+  skeleton_map[13] = 12;
+  // right face
+  skeleton_map[14] = 0;
+  skeleton_map[16] = 14;
+  // left face
+  skeleton_map[15] = 0;
+  skeleton_map[17] = 15;
+
+  return 0;
 }
 
 void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
-    ros::Time t = ros::Time::now();
+  ros::Time t = ros::Time::now();
 
-    cv_bridge::CvImagePtr cv_ptr;
-    try {
-        cv_ptr = cv_bridge::toCvCopy(msg, "bgr8");
-    } catch (cv_bridge::Exception& e) {
-        return;
+  cv_bridge::CvImagePtr cv_ptr;
+  try {
+    cv_ptr = cv_bridge::toCvCopy(msg, "bgr8");
+  } catch (cv_bridge::Exception& e) {
+    return;
+  }
+  if (cv_ptr->image.empty()) return;
+
+  op::Array<float> netInputArray;
+  std::vector<float> scaleRatios;
+  op::Array<float> outputArray;
+
+  // process
+  std::tie(netInputArray, scaleRatios) = cvMatToOpInput->format(cv_ptr->image);
+  double scaleInputToOutput;
+  std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput->format(cv_ptr->image);
+  // Step 3 - Estimate poseKeypoints
+  poseExtractorCaffe->forwardPass(netInputArray, {cv_ptr->image.cols, cv_ptr->image.rows}, scaleRatios);
+  const auto poseKeypoints = poseExtractorCaffe->getPoseKeypoints();
+  const auto faces = faceDetector->detectFaces(poseKeypoints, scaleInputToOutput);
+  faceExtractor->forwardPass(faces, cv_ptr->image, scaleInputToOutput);
+  const auto faceKeypoints = faceExtractor->getFaceKeypoints();
+
+  // publish annotations.
+  openpose_ros_msgs::Persons persons;
+  persons.rostime = t;
+  persons.image_w = outputSize.x;
+  persons.image_h = outputSize.y;
+
+  const int num_people = poseKeypoints.getSize(0);
+  const int num_bodyparts = poseKeypoints.getSize(1);
+
+  for (size_t person_idx = 0; person_idx < num_people; person_idx++) {
+    double confidence = 0.0;
+    int body_count = 0;
+    openpose_ros_msgs::PersonDetection person;
+    for (size_t bodypart_idx = 0; bodypart_idx < num_bodyparts; bodypart_idx++) {
+      size_t final_idx = 3*(person_idx*num_bodyparts + bodypart_idx);
+      openpose_ros_msgs::BodyPartDetection bodypart;
+      bodypart.part_id = bodypart_idx;
+      bodypart.x = poseKeypoints[final_idx];
+      bodypart.y = poseKeypoints[final_idx+1];
+      bodypart.confidence = poseKeypoints[final_idx+2];
+      person.body_part.push_back(bodypart);
+
+      if(bodypart.confidence != 0)
+      {
+        body_count++;
+        confidence += bodypart.confidence;
+      }
     }
-    if (cv_ptr->image.empty()) return;
 
-    op::Array<float> netInputArray;
-    std::vector<float> scaleRatios;
-    op::Array<float> outputArray;
+    // calculate the confidence of body
+    if(body_count != 0)
+      confidence = confidence / body_count;
 
-    // process
-    std::tie(netInputArray, scaleRatios) = cvMatToOpInput->format(cv_ptr->image);
-    double scaleInputToOutput;
-    std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput->format(cv_ptr->image);
-    // Step 3 - Estimate poseKeypoints
-    poseExtractorCaffe->forwardPass(netInputArray, {cv_ptr->image.cols, cv_ptr->image.rows}, scaleRatios);
-    const auto poseKeypoints = poseExtractorCaffe->getPoseKeypoints();
-    const auto faces = faceDetector->detectFaces(poseKeypoints, scaleInputToOutput);
-    faceExtractor->forwardPass(faces, cv_ptr->image, scaleInputToOutput);
-    const auto faceKeypoints = faceExtractor->getFaceKeypoints();
-
-    // publish annotations.
-    openpose_ros_msgs::Persons persons;
-    persons.rostime = t;
-    persons.image_w = outputSize.x;
-    persons.image_h = outputSize.y;
-    
-    const int num_people = poseKeypoints.getSize(0);
-    const int num_bodyparts = poseKeypoints.getSize(1);
-
-    for (size_t person_idx = 0; person_idx < num_people; person_idx++) {
-        openpose_ros_msgs::PersonDetection person;
-        for (size_t bodypart_idx = 0; bodypart_idx < num_bodyparts; bodypart_idx++) {
-            size_t final_idx = 3*(person_idx*num_bodyparts + bodypart_idx);
-            openpose_ros_msgs::BodyPartDetection bodypart;
-            bodypart.part_id = bodypart_idx;
-            bodypart.x = poseKeypoints[final_idx];
-            bodypart.y = poseKeypoints[final_idx+1];
-            bodypart.confidence = poseKeypoints[final_idx+2];
-            person.body_part.push_back(bodypart);
-        }
-        persons.persons.push_back(person);
+    // check the recognized body count and confidence
+    if(body_count > 5 && confidence > 0.3)
+    {
+      persons.persons.push_back(person);
+      ROS_WARN_STREAM_COND(DEBUG_PRINT, "Person[" << person_idx << "] - " << confidence << " | " << body_count);
     }
+  }
+  ROS_WARN_COND(DEBUG_PRINT, "====================================");
+
+  if(persons.persons.size() != 0)
     publish_pose.publish(persons);
 
-    // publish result image with annotation.
-    if (!FLAGS_result_image_topic.empty()) {
-        poseRenderer->renderPose(outputArray, poseKeypoints);
-        faceRenderer->renderFace(outputArray, faceKeypoints);
+  // publish result image with annotation.
+  if (!FLAGS_result_image_topic.empty()) {
+    // poseRenderer->renderPose(outputArray, poseKeypoints);
+    // faceRenderer->renderFace(outputArray, faceKeypoints);
 
-        auto outputImage = opOutputToCvMat->formatToCvMat(outputArray);
+    auto outputImage = opOutputToCvMat->formatToCvMat(outputArray);
 
-        sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", outputImage).toImageMsg();
-        publish_result.publish(msg);
+    // add for demo
+    for (size_t person_idx = 0; person_idx < persons.persons.size(); person_idx++) {
+      openpose_ros_msgs::PersonDetection person = persons.persons[person_idx];
+      // draw line
+      for (size_t bodypart_idx = 0; bodypart_idx < person.body_part.size(); bodypart_idx++) {
+        openpose_ros_msgs::BodyPartDetection bodypart = person.body_part[bodypart_idx];
+        if(bodypart.confidence == 0)
+          continue;
+        cv::Point center_position = cv::Point(bodypart.x, bodypart.y);
+
+        std::map<int, int>::iterator find_it = skeleton_map.find(bodypart_idx);
+        if(find_it != skeleton_map.end())
+        {
+          openpose_ros_msgs::BodyPartDetection upper_joint = person.body_part[skeleton_map[bodypart_idx]];
+
+          if(upper_joint.confidence != 0)
+          {
+            cv::Point upper_position = cv::Point(upper_joint.x, upper_joint.y);
+            cv::line(outputImage, upper_position, center_position, cv::Scalar(0, 255, 0), 2, 8, 0);
+          }
+        }
+      }
+
+      // draw point
+      for (size_t bodypart_idx = 0; bodypart_idx < person.body_part.size(); bodypart_idx++) {
+        openpose_ros_msgs::BodyPartDetection bodypart = person.body_part[bodypart_idx];
+        if(bodypart.confidence == 0)
+          continue;
+
+        cv::Point center_position = cv::Point(bodypart.x, bodypart.y);
+        cv::circle(outputImage, center_position, 5, cv::Scalar(0, 0, 255), -1, 8, 0);      // circle center in red
+      }
     }
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", outputImage).toImageMsg();
+    publish_result.publish(msg);
+  }
 }
 
 int main(int argc, char *argv[])
 {
-    ros::init(argc, argv, "openpose_ros_node");
-    ros::NodeHandle local_nh("~");
+  ros::init(argc, argv, "openpose_ros_node");
+  ros::NodeHandle local_nh("~");
 
-    FLAGS_resolution = getParam(local_nh, "resolution", std::string("640x480"));
-    FLAGS_num_gpu = getParam(local_nh, "num_gpu", -1);
-    FLAGS_num_gpu_start = getParam(local_nh, "num_gpu_start", 1);
-    FLAGS_model_pose = getParam(local_nh, "model_pose", std::string("COCO"));
-    FLAGS_net_resolution = getParam(local_nh, "net_resolution", std::string("640x480"));
-    FLAGS_face = getParam(local_nh, "face", false);
-    FLAGS_no_display = getParam(local_nh, "no_display", false);
+  FLAGS_resolution = getParam(local_nh, "resolution", std::string("640x480"));
+  FLAGS_num_gpu = getParam(local_nh, "num_gpu", -1);
+  FLAGS_num_gpu_start = getParam(local_nh, "num_gpu_start", 1);
+  FLAGS_model_pose = getParam(local_nh, "model_pose", std::string("COCO"));
+  FLAGS_net_resolution = getParam(local_nh, "net_resolution", std::string("640x480"));
+  FLAGS_face = getParam(local_nh, "face", false);
+  FLAGS_no_display = getParam(local_nh, "no_display", false);
 
-    std::string camera_src = getParam(local_nh, "camera", std::string("/camera/image"));
-    FLAGS_result_image_topic = getParam(local_nh, "result_image_topic", std::string(""));
+  std::string camera_src = getParam(local_nh, "camera", std::string("/camera/image"));
+  FLAGS_result_image_topic = getParam(local_nh, "result_image_topic", std::string(""));
 
-    // prepare model
-    init_openpose();
-  
-    // subscribe image
-    ros::NodeHandle nh;
-    image_transport::ImageTransport img_t(nh);
-    image_transport::Subscriber sub = img_t.subscribe(camera_src, 1, imageCallback);
-    if (!FLAGS_result_image_topic.empty()) {
-        publish_result = img_t.advertise(FLAGS_result_image_topic, 1);
-    }
-    publish_pose = nh.advertise<openpose_ros_msgs::Persons>("/openpose/pose", 1);
+  // prepare model
+  init_openpose();
 
-    ros::spin();
-    return 0; 
+  // subscribe image
+  ros::NodeHandle nh;
+  image_transport::ImageTransport img_t(nh);
+  image_transport::Subscriber sub = img_t.subscribe(camera_src, 1, imageCallback);
+  if (!FLAGS_result_image_topic.empty()) {
+    publish_result = img_t.advertise(FLAGS_result_image_topic, 1);
+  }
+  publish_pose = nh.advertise<openpose_ros_msgs::Persons>("/openpose/pose", 1);
+
+  ros::spin();
+  return 0;
 }
