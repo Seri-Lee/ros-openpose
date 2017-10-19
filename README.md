@@ -32,7 +32,7 @@ $ sudo apt-get install ros-indigo-image-common ros-indigo-vision-opencv ros-indi
 
 ```
 $ cd src
-$ git clone https://github.com/ildoonet/ros-openpose
+$ git clone https://github.com/Seri-Lee/ros-openpose.git
 $ cd ..
 $ catkin_make
 ```
